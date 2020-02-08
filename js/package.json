@@ -37,8 +37,10 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.5",
+    "filesize": "^6.0.1",
     "gulp-bundle-assets": "^2.29.0",
     "jquery": "^3.3.1",
+    "plotly.js-dist": "^1.52.2",
     "reload": "^3.0.4"
   }
 }

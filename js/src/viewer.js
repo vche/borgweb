@@ -1,6 +1,8 @@
 let $ = require('jquery')
+let plotly = require('plotly.js-dist')
 let env = require('./env')
 let util = require('./util')
+let filesize = require('filesize')
 
 /********** Log viewer frontend ********/
 let logText = $('#log-text')
@@ -229,6 +231,8 @@ function getCurrentRepo(){
 
 /********** Backup viewer frontend ********/
 function viewBackups(){
+  $("#loadsign").show();
+
   $.getJSON("backups", (data)=>{
     let html = "";
 
@@ -238,7 +242,7 @@ function viewBackups(){
       warning: "",
     }
     let repodivs = "";
-    $.each(data, function(repo, repo_data){
+    $.each(data.repos, function(repo, repo_data){
         let jobsTemplate = "";
         $.each(repo_data.backups, function(p, backup){
           // Add a pannel with this backup info
@@ -247,7 +251,12 @@ function viewBackups(){
               <div class="panel-heading"> ${backup.name} </div>
               <div class="panel-body">
               <table class="repo_info"><thead><tr><th>Date</th><th>Size</th><th>Compr.</th><th>Dedup</th></tr></thead>
-              <tbody><tr><td>${backup.date}</td><td>${backup.size}</td><td>${backup.csize}</td><td>${backup.dsize}</td></tr></tbody></table>
+              <tbody><tr>
+                <td>${backup.date}</td>
+                <td>${filesize(backup.size)}</td>
+                <td>${filesize(backup.csize)}</td>
+                <td>${filesize(backup.dsize)}</td>
+              </tr></tbody></table>
               </div></div></div>`;
         });
 
@@ -255,7 +264,11 @@ function viewBackups(){
         let status = repo_data.last_result;
         let glyphicon = env.icon[status];
         repodivs += `<div class="panel-group"><div class="panel panel-default">
-            <div class="panel-heading"> ${repo} </div>
+            <div class="panel-heading"> ${repo}
+              <span class="badge badge-dark">
+                &nbsp;&nbsp;${repo_data.archives}
+              </span>
+            </div>
             <div class="panel-body" id="repo-panel">
             <span class="glyphicon glyphicon-`+ glyphicon[0] +` list-status-indicator" aria-hidden="true" style='color: ` + glyphicon[1] + ` '></span>`;
 
@@ -265,17 +278,29 @@ function viewBackups(){
         // Addd the status and the info table
         repodivs += `<a> Last backup: ${repo_data.last_date} ${repo_data.last_time} </a>
             <table class="repo_info"><thead><tr><th>Archives</th><th>Size</th><th>Compr.</th><th>Dedup</th></tr></thead>
-            <tbody><tr><td>${repo_data.archives}</td><td>${repo_data.size}</td><td>${repo_data.csize}</td><td>${repo_data.dsize}</td></tr></tbody></table>`;
+            <tbody><tr>
+              <td>${repo_data.archives}</td>
+              <td>${filesize(repo_data.size)}</td>
+              <td>${filesize(repo_data.csize)}</td>
+              <td>${filesize(repo_data.dsize)}</td>
+            </tr></tbody></table>`;
 
         // Append the pannels for the backups
         repodivs += `${jobsTemplate}
             </div></div></div>`;
     });
     $("#repos-list").empty().append(repodivs);
+    var layout = {
+      xaxis: {title: 'Backup date'},
+      yaxis: {title: 'Backup size'},
+      title: 'Stored backups'
+    };
+    plotly.newPlot('backup_plot', data.bargraph);
   });
+  //$("#loadsign").hide();
   $("#backups-overview").show();
+  $("#loadsign").hide();
   $("#log-viewer, #pagination-row, #log-path, #repo-list-container").hide();
-  $("#log-list-container").hide();
 }
 
 function viewRepositories(){
@@ -283,6 +308,7 @@ function viewRepositories(){
   $("#log-files").empty();
   addLogViewAdvise();
   $("#backups-overview").hide();
+  $("#logs-overview").show();
   $("#log-viewer, #log-list-container, #pagination-row, #repo-list-container").show();
 }
 

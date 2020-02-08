@@ -5,6 +5,14 @@ html { height: 100%; }
   border-spacing: 10px;
 }
 
+#backup_header {
+  text-align:center;
+}
+
+#backup_plot {
+  height:250px;
+}
+
 #wrapper {
   padding-left: 0;
   -webkit-transition: all 0.5s ease;

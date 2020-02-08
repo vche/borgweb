@@ -5,7 +5,6 @@ borg client wrapper
 import subprocess, os
 import json
 from pathlib import Path
-from hurry.filesize import size
 
 class BorgClient:
 
@@ -46,13 +45,13 @@ class BorgClient:
             # If we got an archive info
             if "archives" in parsed:
                 info["date"] = parsed["archives"][0]["start"]
-                info["size"] = size(parsed["archives"][0]["stats"]["original_size"])
-                info["csize"] = size(parsed["archives"][0]["stats"]["compressed_size"])
-                info["dsize"] = size(parsed["archives"][0]["stats"]["deduplicated_size"])
+                info["size"] = parsed["archives"][0]["stats"]["original_size"]
+                info["csize"] = parsed["archives"][0]["stats"]["compressed_size"]
+                info["dsize"] = parsed["archives"][0]["stats"]["deduplicated_size"]
             else:
-                info["size"] = size(parsed["cache"]["stats"]["total_size"])
-                info["csize"] = size(parsed["cache"]["stats"]["total_csize"])
-                info["dsize"] = size(parsed["cache"]["stats"]["unique_csize"])
+                info["size"] = parsed["cache"]["stats"]["total_size"]
+                info["csize"] = parsed["cache"]["stats"]["total_csize"]
+                info["dsize"] = parsed["cache"]["stats"]["unique_csize"]
         except (json.JSONDecodeError, KeyError) as e:
             print(f"ERROR: Invalid borg info output: {e}")
         return info

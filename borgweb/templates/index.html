@@ -3,6 +3,7 @@
 {% block content %}
 <!-- Page Content -->
 <div id="page-content-wrapper">
+    <h1 id="backup_header">Borg repositories backups sumary</h1>
     <div class="container-fluid" id="page-content">
       <div class="row">
         <div class="col-sm-offset-3 col-sm-9">
@@ -11,11 +12,14 @@
       </div>
       <div class="row" id="content-row">
         <div id="backups-overview">
+	  <div class="row"><div id="backup_plot"></div></div>
           <div class="row" id="repos-list">
-
+	    <div id="loadsign" class="spinner-border" role="status">
+              <span class="-srp-only">Loading...</span>
+            </div>
           </div>
         </div>
-        <div id="">
+        <div id="logs-overview">
           <!-- log file list, log text -->
           <div class="col-sm-3 list-viewer well" id="repo-list-container">
             <ul id="repo-list" class="nav nav-pills nav-stacked"></ul>
