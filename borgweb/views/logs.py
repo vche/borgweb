@@ -4,7 +4,7 @@ logs view
 
 import os
 
-from flask import current_app, render_template, jsonify, abort
+from flask import current_app, render_template, jsonify, abort, request
 
 from . import blueprint
 
@@ -21,16 +21,22 @@ def overall_classifier(f):
     except IndexError:
         return DANGER  # something strange happened, empty log?
     try:
-        line = line.split(" ", 3)[3]  # get msg from "date time level msg"
-    except IndexError:
+        tokens = line.split(" ", 3)  # get from "date time level msg"
+        line_date = tokens[0]
+        line_time = tokens[1]
+        line_msg = tokens[3]
+    except IndexError as e:
         # unexpected log line format
-        return DANGER
-    if line.startswith('terminating with'):
-        if line.endswith('rc 0'):
-            return SUCCESS
-        if line.endswith('rc 1'):
-            return WARNING
-    return DANGER  # rc == 2 or other, or no '--show-rc' given. 
+        return DANGER, None, None
+
+    # Default,  rc == 2 or other, or no '--show-rc given'
+    status = DANGER
+    if line_msg.startswith('terminating with'):
+        if line_msg.endswith('rc 0'):
+            status = SUCCESS
+        elif line_msg.endswith('rc 1'):
+            status = WARNING
+    return status, line_date, line_time
 
 
 def line_classifier(line):
@@ -46,13 +52,20 @@ def line_classifier(line):
     return DANGER
 
 
-def _get_logs():
+def _get_logs(repo):
     log_dir = current_app.config['LOG_DIR']
-    log_dir = os.path.abspath(log_dir)
     try:
+        repo_logs = current_app.config['BACKUP_REPOS'][repo]['log_path']
+        log_dir = repo_logs
+        if repo_logs.startswith(os.sep):
+            log_dir = repo_logs
+        else:
+            log_dir = log_dir + "/" + repo_logs + "/"
+        log_dir = os.path.abspath(log_dir)
         log_files = os.listdir(log_dir)
-    except OSError:
+    except (KeyError, OSError) as e:
         log_files = []
+        print(f"Invalid configuration: {e}")
     return log_dir, sorted(log_files, reverse=True)
 
 
@@ -101,8 +114,8 @@ def _get_log_lines(log_dir, log_file, offset, linecount=None, direction=1):
     return log_file, offset, log_lines
 
 
-@blueprint.route('/logs/<int:index>/<offset>:<linecount>:<direction>')
-def get_log_fragment(index, offset, linecount, direction):
+@blueprint.route('/logs/<string:repo>/<int:index>/<offset>:<linecount>:<direction>')
+def get_log_fragment(repo, index, offset, linecount, direction):
     try:
         offset = int(offset)
     except ValueError:
@@ -117,7 +130,7 @@ def get_log_fragment(index, offset, linecount, direction):
             raise ValueError
     except ValueError:
         direction = 1
-    log_dir, log_files = _get_logs()
+    log_dir, log_files = _get_logs(repo)
     try:
         log_file = log_files[index]
     except IndexError:
@@ -127,9 +140,9 @@ def get_log_fragment(index, offset, linecount, direction):
     return jsonify(dict(lines=log_lines, offset=offset))
 
 
-@blueprint.route('/logs/<int:index>')
-def get_log(index):
-    log_dir, log_files = _get_logs()
+@blueprint.route('/logs/<string:repo>/<int:index>')
+def get_log(repo, index):
+    log_dir, log_files = _get_logs(repo)
     try:
         log_file = log_files[index]
     except IndexError:
@@ -138,12 +151,17 @@ def get_log(index):
         log_file = os.path.join(log_dir, log_file)
     with open(log_file, 'r') as f:
         length = f.seek(0, os.SEEK_END)
-        status = overall_classifier(f)
+        status, _, _ = overall_classifier(f)
         return jsonify(dict(filename=log_file, status=status, length=length))
 
+def getLogFileStatus(log_file):
+    with open(log_file, 'r') as f:
+        length = f.seek(0, os.SEEK_END)
+        return overall_classifier(f)
 
-@blueprint.route('/logs')
-def get_logs():
-    log_dir, log_files = _get_logs()
+
+@blueprint.route('/logs/<string:repo>')
+def get_logs(repo):
+    log_dir, log_files = _get_logs(repo)
     return jsonify(dict(dir=log_dir,
                         files=list(enumerate(log_files))))

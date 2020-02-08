@@ -1,0 +1,19 @@
+[Unit]
+Description=Borgweb Daemon
+After=syslog.target network.target
+
+[Service]
+WorkingDirectory=/opt/borgweb/
+User=root
+Group=root
+UMask=0002
+Restart=on-failure
+RestartSec=5
+Type=simple
+ExecStart=/opt/borgweb/borg-env/bin/borgweb
+KillSignal=SIGINT
+TimeoutStopSec=20
+SyslogIdentifier=borgweb
+
+[Install]
+WantedBy=multi-user.target
