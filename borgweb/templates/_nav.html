@@ -1,43 +1,46 @@
-    <!-- Sidebar -->
-    <div id="sidebar-wrapper">
-        <ul class="sidebar-nav">
-          <li class="sidebar-brand">
-                <a href="#">
-                    <span class="borg-green">Borg</span>Web
-                </a>
-            </li>
-            <li>
-              <a href="#"
-                 onclick="window.viewBackups()">
-                 <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
-                 Backups
-               </a>
-            </li>
-            <li>
-              <a href="#"
-                 onclick="window.viewRepositories()">
-                 <span class="glyphicon glyphicon-hdd" aria-hidden="true"></span>
-                 Logs
-               </a>
-            </li>
-            <li>
-                <a href="https://borgweb.readthedocs.io/"
-                   class="navbar-link i18n"
-                   title="Open docs in new window"
-                   target="_blank">
-                   <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-                   <x-i18n>Documentation</x-i18n>
-                 </a>
-            </li>
-            <li>
-                <a href="https://github.com/vche/borgweb"
-                   class="navbar-link i18n"
-                   title="See source code on Github"
-                   target="_blank">
-                   <span class="glyphicon glyphicon-wrench"></span>
-                   Github
-                 </a>
-            </li>
-        </ul>
-    </div>
-    <!-- /#sidebar-wrapper -->
+<!-- Beginning of naviguation bar -->
+<nav class="navbar navbar-expand-sm fixed-top navbar-dark bg-dark">
+
+  <!-- Collapse button, displayed when the menu is collapsed -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar_content" aria-controls="navbar_content" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbar_content">
+    <span class="navbar-brand mb-0 h1"><span class="borg-green">Borg</span>Web </span>
+    <ul class="navbar-nav mr-auto">
+    <li class="nav-item active">
+      <a class="nav-link i18n" href="#" onclick="window.viewBackups()">
+        <span class="fas fa-archive"></span>
+        <x-i18n>Backups</x-i18n> <span class="sr-only">(current)</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link i18n" href="#" onclick="window.viewRepositories()">
+        <span class="fas fa-hdd"></span>
+        <x-i18n>Logs</x-i18n>
+      </a>
+    </li>
+    </ul>
+    <ul class="mr-sm-2 navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link i18n" href="https://borgweb.readthedocs.io/"
+         title="Open docs in new window"
+         target="_blank">
+        <span class="fas fa-book"></span>
+          <x-i18n>Documentation</x-i18n>
+       </a>
+     </li>
+     <li class="nav-item">
+       <a class="nav-link i18n"  href="https://github.com/vche/borgweb"
+          title="See source code on Github"
+          target="_blank">
+         <span class="fab fa-github"></span>
+         Github
+       </a>
+      </li>
+
+    </ul>
+  </div>
+</nav>
+<!-- End of naviguation bar -->

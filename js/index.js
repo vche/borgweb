@@ -5,6 +5,8 @@ var i18n = require('./src/i18n')
 //var log = require('./src/util').log
 var viewer = require('./src/viewer')
 var util = require('./src/util')
+require('popper.js')
+require('bootstrap')
 
 /**
   ~~ UI callables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,7 +26,6 @@ window.lastPage = viewer.lastPage
 /**
   ~~ Site init ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-util.sbToggleRegister()
 viewer.viewBackups()
 i18n.translate()
 
@@ -35,6 +36,6 @@ $(window).resize(function () {
   if (Date.now() - env['lastRendering'] >= env['reRenderCoolDown']) {
     util.log('Re-rendering')
     env['lastRendering'] = Date.now()
-    setTimeout(viewer.render, env['reRenderCoolDown'] / 2)
+    // setTimeout(viewer.render, env['reRenderCoolDown'] / 2)
   }
 })

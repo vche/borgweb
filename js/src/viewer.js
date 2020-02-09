@@ -9,6 +9,27 @@ let logText = $('#log-text')
 let noLogsError = $('#no-logs-error')
 let currentRepo = "";
 
+function updateRepoList () {
+  let repoListHtml = []
+  $.getJSON('repos', res => {
+    let i = 0
+    $.each(res, (name, value) => {
+      repoListHtml += `
+        <li>
+          <a onClick="window.getLogFiles('${ name }')" >
+          <span class="glyphicon glyphicon-hdd"
+          aria-hidden="true"></span>
+            ${ name }
+          </a>
+        </li>`
+      i++
+    })
+
+    $('#repo-list').html(repoListHtml)
+
+  })
+}
+
 function highlightListEntry (id) {
   $('.shown-log').toggleClass('shown-log')
   $(`#log-${ id }`).toggleClass('shown-log')
@@ -53,27 +74,6 @@ function updateLogFileList (repo) {
     }
 
     $('#log-files').html(logFilesListHTML)
-
-  })
-}
-
-function updateRepoList () {
-  let repoListHtml = []
-  $.getJSON('repos', res => {
-    let i = 0
-    $.each(res, (name, value) => {
-      repoListHtml += `
-        <li>
-          <a onClick="window.getLogFiles('${ name }')" >
-          <span class="glyphicon glyphicon-hdd"
-          aria-hidden="true"></span>
-            ${ name }
-          </a>
-        </li>`
-      i++
-    })
-
-    $('#repo-list').html(repoListHtml)
 
   })
 }
@@ -155,10 +155,11 @@ function displayLogSection (state, availableLines) {
 }
 
 function render (availableLines) {
-  availableLines = availableLines || util.determineLineCount()
-  let state = getSetState()
-  updatePathAndStatus(state.log - 1)
-  displayLogSection(state, availableLines)
+  console.log("rendering")
+  // availableLines = availableLines || util.determineLineCount()
+  // let state = getSetState()
+  // updatePathAndStatus(state.log - 1)
+  // displayLogSection(state, availableLines)
 }
 
 function switchToLog (id) {
@@ -230,86 +231,114 @@ function getCurrentRepo(){
 }
 
 /********** Backup viewer frontend ********/
+function _build_repo_card(repo, repo_data, backup_table_body) {
+  // Optionally add the start button
+  var reporun = "";
+  if (("script" in repo_data) && (repo_data.script != "")) {
+      reporun = `<button class='btn btn-dark pull-right btn-sm'>Run</button>`;
+  }
+
+  var repo_id=repo.replace(/[ -.:;#]/g, "")
+  return `<div class="card text-white bg-secondary">
+    <div class="card-header">
+      <a class="repo-card-collapse" data-toggle="collapse" href="#card-content-${repo_id}">${repo}</a>
+      <span class="badge badge-pill badge-dark repo-badge">
+        ${repo_data.archives}
+      </span>
+      <span class='backup-${repo_data.last_result}'>
+        <span class="icon-success fas fa-check-circle"></span>
+        <span class="icon-error fas fa-exclamation-circle"></span>
+        <span>Last backup ${repo_data.last_date} at ${repo_data.last_time}</span>
+      </span>
+    </div>
+    <div class="card-body collapse" id="card-content-${repo_id}">
+      <div class="card text-white bg-dark">
+        <div class="card-header"> Repo info</div>
+        <div class="card-body">
+          <ul class="list-group list-group-horizontal-md">
+            <li class="list-group-item list-group-item-dark">
+              Total size: ${filesize(repo_data.size)}
+            </li>
+            <li class="list-group-item list-group-item-dark">
+              Compressed size: ${filesize(repo_data.csize)}
+            </li>
+            <li class="list-group-item list-group-item-dark">
+              Deduped size: ${filesize(repo_data.dsize)}
+            </li>
+            <li class="list-group-item list-group-item-dark ">
+              ${reporun}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="card text-white bg-dark">
+        <div class="card-header"> Backups info</div>
+        <div class="card-body">
+          <table class="backup-table table table-dark table-striped table-bordered table-sm">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Size</th>
+                <th scope="col">Compr.</th>
+                <th scope="col">Deduped</th>
+              </tr>
+            </thead>
+            <tbody>${backup_table_body}</tbody>
+          </table>
+        </div>
+      </div>
+    </div></div>
+  `;
+}
+
+/********** Pages entrypoints ********/
+// Backup page entry point
 function viewBackups(){
-  $("#loadsign").show();
-
   $.getJSON("backups", (data)=>{
-    let html = "";
-
-    let x = {
-      success: "",
-      error: "",
-      warning: "",
-    }
-    let repodivs = "";
+    let repocards = "";
     $.each(data.repos, function(repo, repo_data){
-        let jobsTemplate = "";
+        let backup_table_body = "";
         $.each(repo_data.backups, function(p, backup){
-          // Add a pannel with this backup info
-          jobsTemplate += `<div class="col-md-4">
-              <div class="panel panel-primary">
-              <div class="panel-heading"> ${backup.name} </div>
-              <div class="panel-body">
-              <table class="repo_info"><thead><tr><th>Date</th><th>Size</th><th>Compr.</th><th>Dedup</th></tr></thead>
-              <tbody><tr>
-                <td>${backup.date}</td>
-                <td>${filesize(backup.size)}</td>
-                <td>${filesize(backup.csize)}</td>
-                <td>${filesize(backup.dsize)}</td>
-              </tr></tbody></table>
-              </div></div></div>`;
+          // Add a line to the table for this backup
+          backup_table_body = `<tr>
+              <td>${backup.date}</td>
+              <td>${filesize(backup.size)}</td>
+              <td>${filesize(backup.csize)}</td>
+              <td>${filesize(backup.dsize)}</td>
+            </tr>` + backup_table_body;
         });
 
         // Build the repo global info
-        let status = repo_data.last_result;
-        let glyphicon = env.icon[status];
-        repodivs += `<div class="panel-group"><div class="panel panel-default">
-            <div class="panel-heading"> ${repo}
-              <span class="badge badge-dark">
-                &nbsp;&nbsp;${repo_data.archives}
-              </span>
-            </div>
-            <div class="panel-body" id="repo-panel">
-            <span class="glyphicon glyphicon-`+ glyphicon[0] +` list-status-indicator" aria-hidden="true" style='color: ` + glyphicon[1] + ` '></span>`;
-
-        // Optionally add the start button
-        if (("script" in repo_data) && (repo_data.script != ""))
-            repodivs += `<button class='btn btn-primary pull-right'>Run</button>`;
-        // Addd the status and the info table
-        repodivs += `<a> Last backup: ${repo_data.last_date} ${repo_data.last_time} </a>
-            <table class="repo_info"><thead><tr><th>Archives</th><th>Size</th><th>Compr.</th><th>Dedup</th></tr></thead>
-            <tbody><tr>
-              <td>${repo_data.archives}</td>
-              <td>${filesize(repo_data.size)}</td>
-              <td>${filesize(repo_data.csize)}</td>
-              <td>${filesize(repo_data.dsize)}</td>
-            </tr></tbody></table>`;
-
-        // Append the pannels for the backups
-        repodivs += `${jobsTemplate}
-            </div></div></div>`;
+        repocards += _build_repo_card(repo, repo_data, backup_table_body)
     });
-    $("#repos-list").empty().append(repodivs);
+
+    // Update the backup graph
     var layout = {
       xaxis: {title: 'Backup date'},
       yaxis: {title: 'Backup size'},
       title: 'Stored backups'
     };
-    plotly.newPlot('backup_plot', data.bargraph);
+    plotly.newPlot('backup-plot', data.bargraph, layout);
+
+    // Add the repo html
+    $("#repo-card-list").empty().append(repocards);
+    $("#loadsign").hide();
+    $("#backups-overview").show();
   });
-  //$("#loadsign").hide();
-  $("#backups-overview").show();
-  $("#loadsign").hide();
+
+  // Display results
+  $("#backups-container").show();
   $("#log-viewer, #pagination-row, #log-path, #repo-list-container").hide();
 }
 
+// Log page entry point
 function viewRepositories(){
-  updateRepoList();
-  $("#log-files").empty();
-  addLogViewAdvise();
-  $("#backups-overview").hide();
-  $("#logs-overview").show();
-  $("#log-viewer, #log-list-container, #pagination-row, #repo-list-container").show();
+  // updateRepoList();
+  // $("#log-files").empty();
+  // addLogViewAdvise();
+  // $("#backups-overview").hide();
+  // $("#logs-overview").show();
+  // $("#log-viewer, #log-list-container, #pagination-row, #repo-list-container").show();
 }
 
 module.exports = {

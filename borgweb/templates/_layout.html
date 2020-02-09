@@ -10,28 +10,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <link href="{{ url_for('static', filename='bootstrap/bootstrap.min.css') }}" rel="stylesheet">
-        <link href="{{ url_for('static', filename='bootstrap/bootstrap-theme.min.css') }}" rel="stylesheet">
+        <!-- <link href="{{ url_for('static', filename='bootstrap/bootstrap-theme.min.css') }}" rel="stylesheet"> -->
+        <link href="{{ url_for('static', filename='fontawesome/all.css') }}" rel="stylesheet">
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-        <style>
-            #list-view {
-                background-image: url({{ url_for('static',
-                    filename='file-list-shadow.png') }});
-            }
-        </style>
     </head>
+
     <body>
-
-      <div id="wrapper" >
+        <div id="wrapper" >
             {% include '_nav.html' %}
-
-            <nav><div class="container-fluid">
-                <button type="button" id="sidebarCollapse" class="btn btn-info">
-                  <i class="fas fa-align-left"></i>
-                  <span>|||</span>
-                </button>
-            </div></nav>
             {% block content %}{% endblock %}
-      </div>
-
+        </div>
     </body>
 </html>

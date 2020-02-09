@@ -4,13 +4,6 @@ let dateformat = require('dateformat')
 /**
   ~~ Utility ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-function sbToggleRegister() {
-  $('#sidebarCollapse').on('click', function () {
-            $('#wrapper').toggleClass('toggled');
-  });
-}
-
 function log () {
   var args = Array.prototype.slice.call(arguments)
   var time = '[' + dateformat(new Date(), 'HH:MM:ss') + ']'
@@ -50,7 +43,6 @@ function determineLineCount () {
 
 module.exports = {
   log: log,
-  sbToggleRegister: sbToggleRegister,
   isInt: isInt,
   success: success,
   parseAnchor: parseAnchor,

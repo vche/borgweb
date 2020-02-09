@@ -3,33 +3,52 @@
 {% block content %}
 <!-- Page Content -->
 <div id="page-content-wrapper">
-    <h1 id="backup_header">Borg repositories backups sumary</h1>
-    <div class="container-fluid" id="page-content">
+  <h1 id="backup_header">Borg repositories backups sumary</h1>
+  <div class="container-fluid" id="page-content">
+
+    <!-- Loading sign --->
+    <div id="loadsign">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Container for the backup page --->
+    <div id="backups-container" class="container-fluid">
+      <!-- Row for the repo backups graph --->
+      <div class="row" id="graph-row">
+        <div class="col">
+	        <div id="backup-plot"></div>
+        </div>
+      </div>
+
+      <!-- Row for the repos --->
+      <div class="row " id="repos-row">
+        <div class="col" id="repo-card-list">
+          <!-- Repo cards are added here --->
+        </div>
+        <!-- End of repo cards --->
+      </div>
+    </div>
+    <!-- End of backup page --->
+
+    <!-- Container for the log page --->
+    <div id="logs-container" class="container-fluid">
       <div class="row">
         <div class="col-sm-offset-3 col-sm-9">
           <p id="log-path"></p>
         </div>
       </div>
-      <div class="row" id="content-row">
-        <div id="backups-overview">
-	  <div class="row"><div id="backup_plot"></div></div>
-          <div class="row" id="repos-list">
-	    <div id="loadsign" class="spinner-border" role="status">
-              <span class="-srp-only">Loading...</span>
-            </div>
-          </div>
+      <div id="logs-overview">
+        <!-- log file list, log text -->
+        <div class="col-sm-3 list-viewer well" id="repo-list-container">
+          <ul id="repo-list" class="nav nav-pills nav-stacked"></ul>
         </div>
-        <div id="logs-overview">
-          <!-- log file list, log text -->
-          <div class="col-sm-3 list-viewer well" id="repo-list-container">
-            <ul id="repo-list" class="nav nav-pills nav-stacked"></ul>
-          </div>
-          <div class="col-sm-2 list-viewer well" id="log-list-container">
-            <ul id="log-files" class="list-group "></ul>
-          </div>
-          <div class="col-sm-6" id="log-viewer">
-              <pre id="log-text"></pre>
-          </div>
+        <div class="col-sm-2 list-viewer well" id="log-list-container">
+          <ul id="log-files" class="list-group "></ul>
+        </div>
+        <div class="col-sm-6" id="log-viewer">
+            <pre id="log-text"></pre>
         </div>
       </div>
       <div class="row" id="pagination-row">
@@ -55,8 +74,10 @@
           </ul>
         </div>
       </div>
-      <!-- <a href="#menu-toggle"  class="btn btn-secondary" id="menu-toggle">Toggle Menu</a> -->
     </div>
+    <!-- End of log page --->
+
+  </div>
 </div>
 <script src="{{ url_for('static', filename='bundle.js') }}"></script>
 {% endblock %}

@@ -23,11 +23,12 @@ def get_backups():
         repo_data = {}
         repo_graph = {"type": "bar", "name": repo, "x":[], "y":[]}
         repo_data["backups"] = []
+        repo_data["script"] = repo_config.get("script", "")
+
 
         # Get repo info
         borg.set_repo(repo_config["repo_path"], pwd=repo_config["repo_pwd"])
         borg_info = borg.info()
-        print(f"pipo {borg_info} for {repo_config['repo_path']} : {repo_config['repo_pwd']}")
         repo_data.update(borg_info)
 
         # Get backup list
@@ -46,7 +47,7 @@ def get_backups():
         if(len(log_files) > 0):
             repo_data["last_result"], repo_data["last_date"], repo_data["last_time"] = logs.getLogFileStatus(log_dir + "/" + log_files[0])
 
-        # Get details on each bqckup
+        # Get details on each backup
         for backup in repo_data["backups"]:
             borg_archinfo = borg.info(archive=backup["name"])
             backup.update(borg_archinfo)

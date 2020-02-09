@@ -36,11 +36,13 @@
     "prependify": "^1.1.4"
   },
   "dependencies": {
-    "bootstrap": "^3.3.5",
+    "@fortawesome/fontawesome-free": "^5.12.1",
+    "bootstrap": "^4.4.1",
     "filesize": "^6.0.1",
     "gulp-bundle-assets": "^2.29.0",
     "jquery": "^3.3.1",
     "plotly.js-dist": "^1.52.2",
+    "popper.js": "^1.16.1",
     "reload": "^3.0.4"
   }
 }
