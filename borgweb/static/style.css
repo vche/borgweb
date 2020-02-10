@@ -1,11 +1,23 @@
 html { height: 100%; }
-page-content-wrapper {
-    background: linear-gradient(to bottom,#3c3c3c 0,#222 100%);
+
+body {
+background: linear-gradient(to bottom,#3c3c3c 0,#222 100%);
+}
+
+#page-content-wrapper {
+    padding-top: 75px;
+}
+
+nav {
+    background: black;
+}
+#backup_header {
+    text-align: center;
 }
 
 /* Loading spinner styling */
 #loadsign {
-  margin:20px;
+  margin:80px;
   text-align:center;
 }
 #loadsign .spinner-border {

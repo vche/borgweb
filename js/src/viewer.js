@@ -245,10 +245,10 @@ function _build_repo_card(repo, repo_data, backup_table_body) {
       <span class="badge badge-pill badge-dark repo-badge">
         ${repo_data.archives}
       </span>
-      <span class='backup-${repo_data.last_result}'>
+      <span class='backup-${repo_data.last_result}' style="text-align:right">
         <span class="icon-success fas fa-check-circle"></span>
         <span class="icon-error fas fa-exclamation-circle"></span>
-        <span>Last backup ${repo_data.last_date} at ${repo_data.last_time}</span>
+        <span  style="text-align:right">Last backup ${repo_data.last_date} at ${repo_data.last_time}</span>
       </span>
     </div>
     <div class="card-body collapse" id="card-content-${repo_id}">
@@ -318,12 +318,16 @@ function viewBackups(){
       yaxis: {title: 'Backup size'},
       title: 'Stored backups'
     };
-    plotly.newPlot('backup-plot', data.bargraph, layout);
+    var config = {
+      scrollZoom: true,
+      responsive: true
+    }
+    plotly.newPlot('backup-plot', data.bargraph, layout, config);
 
     // Add the repo html
     $("#repo-card-list").empty().append(repocards);
     $("#loadsign").hide();
-    $("#backups-overview").show();
+    $("#backups-container").show();
   });
 
   // Display results

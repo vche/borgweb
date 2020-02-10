@@ -3,12 +3,11 @@
 {% block content %}
 <!-- Page Content -->
 <div id="page-content-wrapper">
-  <h1 id="backup_header">Borg repositories backups sumary</h1>
   <div class="container-fluid" id="page-content">
 
     <!-- Loading sign --->
     <div id="loadsign">
-      <div class="spinner-border" role="status">
+      <div class="spinner-border text-light" role="status">
         <span class="sr-only">Loading...</span>
       </div>
     </div>
@@ -16,9 +15,20 @@
     <!-- Container for the backup page --->
     <div id="backups-container" class="container-fluid">
       <!-- Row for the repo backups graph --->
+      <div class="row">
+        <div class="col">
+          <h2 id="backup_header" class="text-light">Borg repositories backups</h2>
+        </div>
+      </div>
+
+      <!-- Row for the repo backups graph --->
       <div class="row" id="graph-row">
         <div class="col">
-	        <div id="backup-plot"></div>
+          <div class="card text-white">
+            <div class="card-body">
+              <div id="backup-plot"></div>
+            </div>
+          </div>
         </div>
       </div>
 
