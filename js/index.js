@@ -17,6 +17,7 @@ window.startBackup = backup.startBackup
 window.switchToLog = viewer.switchToLog
 window.getLogFiles = viewer.getLogFiles
 window.viewBackups = viewer.viewBackups
+window.cacheInvalidate = viewer.cacheInvalidate
 window.viewRepositories = viewer.viewRepositories
 window.nextPage = viewer.nextPage
 window.previousPage = viewer.previousPage

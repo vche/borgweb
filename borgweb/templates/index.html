@@ -14,12 +14,19 @@
 
     <!-- Container for the backup page --->
     <div id="backups-container" class="container-fluid">
-      <!-- Row for the repo backups graph --->
+      <!-- Row for the repo backups title --->
       <div class="row">
         <div class="col">
           <h2 id="backup_header" class="text-light">Borg repositories backups</h2>
         </div>
       </div>
+      <button type="button" class="btn btn-success btn-sm" onclick="window.cacheInvalidate()">
+        <i class="fas fa-redo-alt"></i>
+        <small>
+          <span>Last refresh: </span>
+          <span id="refresh-time"></span>
+        </small>
+      </button>
 
       <!-- Row for the repo backups graph --->
       <div class="row" id="graph-row">

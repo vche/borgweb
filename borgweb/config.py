@@ -10,8 +10,12 @@ class Config(object):
     LOG_DIR = '/var/log/borg'
     BORG_PATH="/usr/bin/borg"
 
+    # Repo status cache configuration. TTL in secs
+    STATUS_CACHE_TTL=43200
+    STATUS_CACHE_PATH="/tmp/borgweb.cache"
+
     # Unused
-    REPOSITORY = '/var/www/repo' # 
+    REPOSITORY = '/var/www/repo' #
     NAME = 'localhost'
     BORG_LOGGING_CONF = "/var/log/borg/logging.conf"
     TO_BACKUP = "/var/www/borgWebDan" # unused ?

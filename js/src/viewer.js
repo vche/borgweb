@@ -292,6 +292,13 @@ function _build_repo_card(repo, repo_data, backup_table_body) {
 }
 
 /********** Pages entrypoints ********/
+function cacheInvalidate(){
+  $.get("cacheflush", (data)=>{
+    $("#loadsign").show();
+    viewBackups();
+  });
+}
+
 // Backup page entry point
 function viewBackups(){
   $.getJSON("backups", (data)=>{
@@ -325,6 +332,7 @@ function viewBackups(){
     plotly.newPlot('backup-plot', data.bargraph, layout, config);
 
     // Add the repo html
+    $("#refresh-time").empty().append(data.ctime);
     $("#repo-card-list").empty().append(repocards);
     $("#loadsign").hide();
     $("#backups-container").show();
@@ -349,6 +357,7 @@ module.exports = {
   getCurrentRepo: getCurrentRepo,
   updateRepoList: updateRepoList,
   viewBackups: viewBackups,
+  cacheInvalidate:cacheInvalidate,
   viewRepositories: viewRepositories,
   render: render,
   switchToLog: switchToLog,

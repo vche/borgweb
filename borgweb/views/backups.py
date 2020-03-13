@@ -2,19 +2,44 @@
 backup view
 """
 
-import subprocess
 import time
 
 from flask import current_app, render_template, jsonify
 from . import blueprint
 from . import logs
+import os
 from borgweb.borg import BorgClient
+import json
+from pathlib import Path
 
-process = None
 
+@blueprint.route('/cacheflush', methods=['GET'])
+def invalidate_backup_cache():
+    # Invalidate the cache by removing the file
+    filepath = Path(current_app.config["STATUS_CACHE_PATH"])
+    if filepath.is_file():
+        os.remove(filepath)
+    return "{'status':'ok'}"
 
 @blueprint.route('/backups', methods=['GET'])
 def get_backups():
+    # Get data from cache, and if invalid create it
+    return load_backup_cache() or create_backup_status()
+
+def save_backup_cache(cache_data):
+    with open(current_app.config["STATUS_CACHE_PATH"], "w") as f:
+        f.write(cache_data)
+
+def load_backup_cache():
+    filepath = Path(current_app.config["STATUS_CACHE_PATH"])
+    cache_ttl = current_app.config["STATUS_CACHE_TTL"]
+    if filepath.is_file() and ((time.time() - filepath.stat().st_mtime) < cache_ttl):
+        with open(filepath, "r") as f:
+            return json.load(f)
+    else:
+        return None
+
+def create_backup_status():
     repos = dict(current_app.config["BACKUP_REPOS"])
     output = { "repos": {}, "bargraph":[] }
     borg = BorgClient(current_app.config["BORG_PATH"])
@@ -56,4 +81,9 @@ def get_backups():
 
         output["repos"][repo] = repo_data
         output["bargraph"].append(repo_graph)
-    return jsonify(output)
+        output["ctime"] = time.ctime()
+
+    # Convert the data to json, cache it and return it
+    status_data = json.dumps(output)
+    save_backup_cache(status_data)
+    return status_data
