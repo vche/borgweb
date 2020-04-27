@@ -1,14 +1,23 @@
 #!/bin/sh
 
-# Setting this, so the repo does not need to be given on the commandline:
-export BORG_REPO=/media/backupdisk/backup/server1
 
 # Setting this, so you won't be asked for your repository passphrase:
 export BORG_PASSPHRASE='backup'
 # or this to ask an external program to supply the passphrase:
 #export BORG_PASSCOMMAND='pass show backup'
 
-LOG_FILE="/var/log/borg/$(hostname)/$(hostname)-$(date +'%Y-%m-%dT%H%M%S').log"
+# Log file name format to include timestamp
+LOG_FILE_NAME="$(hostname)-$(date +'%Y-%m-%dT%H%M%S').log"
+LOG_FILE="/var/log/borg/$LOG_FILE_NAME"
+
+# Local backup storage
+export BORG_REPO=/media/backupdisk/backup/server1
+REMOTE_LOG_FILE=""
+
+# Remote backup storage: Enable and configure the following lines
+#BORG_SERVER=user@server1.local
+#export BORG_REPO=ssh://$BORG_SERVER/media/backupdisk/backup/server2
+#REMOTE_LOG_FILE="$BORG_SERVER:/var/log/borg/server2/$LOG_FILE_NAME"
 
 # some helpers and error handling:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
@@ -93,6 +102,12 @@ print_status $global_exit 2>>$LOG_FILE
 
 # Append the backup status again for borgweb compatibility
 echo "$(date +'%Y-%m-%d %H:%M:%S') [INFO] terminating with success status, rc ${global_exit}" >>$LOG_FILE
+
+# Copy to remote server if configured
+if [ "$REMOTE_LOG_FILE" != "" ]; then
+  echo "scp $LOG_FILE $REMOTE_LOG_FILE"
+  scp $LOG_FILE $REMOTE_LOG_FILE
+fi
 
 exit ${global_exit}
 
