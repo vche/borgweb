@@ -8,7 +8,7 @@ if sys.version_info < min_python:
 
 from setuptools import setup, find_packages
 
-with open('README.rst', 'r') as fd:
+with open('README.md', 'r') as fd:
     long_description = fd.read()
 
 setup(
