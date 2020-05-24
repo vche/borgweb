@@ -12,11 +12,17 @@ Keep in mind this is still in development and many things remain to be done.
 
 ![Screenshot](https://github.com/vche/borgweb/blob/master/etc/borgweb-vche.png)
 
+![Screenshot](https://github.com/vche/borgweb/blob/master/etc/borgweb-logs-vche.png)
+
 The main backup page shows:
 * A graph with a timeline of all available backups for every repositories
 * Details on each backups (timestamp, size...)
 * Color based status of each backup (success, failure, warning)
 * Manual rescan of all backups
+
+The log page shows:
+* For each repo in the config, the list of log files available and their exit code
+* Once a log file is selected, its content is displayed on the right card
 
 Example scripts are provided in [etc](https://github.com/vche/borgweb/tree/master/etc) to:
 * Create a backup stored locally or in a remote server (can be put in a cron job)
@@ -24,8 +30,7 @@ Example scripts are provided in [etc](https://github.com/vche/borgweb/tree/maste
 
 
 TODO:
-* The log reading page is currently broken and will be fixed shortly
-* Direct links to the related logs will be linked from the backup page
+* Add links to logs to each backup (currently only the most recent one has is linked)
 * Async backup scan to improve loading
 * Manually run a backup script when configured
 
@@ -102,4 +107,3 @@ BORG_LOGGING_CONF = "/var/log/borg/logging.conf"
 TO_BACKUP = "/var/www/borgWebDan"
 BACKUP_CMD = "BORG_LOGGING_CONF={BORG_LOGGING_CONF} borg create --list --stats --show-version --show-rc {REPOSITORY}::{NAME}-{LOCALTIME} {TO_BACKUP} >{LOG_DIR}/test/{NAME}-{LOCALTIME} 2>&1 </dev/null"
 ```
-

@@ -57,5 +57,12 @@ class Config(object):
             "log_path": "/var/log/borg/dwarfpi",
             "repo_pwd": "backup",
             "backups": []
+        },
+       "domodwarf": {
+            "repo_path": "/media/dwarfdisk/Backup/domodwarf",
+            "log_path": "/var/log/borg/domodwarf",
+            "repo_pwd": "backup",
+            "backups": []
         }
     }
+

@@ -13,12 +13,13 @@ require('bootstrap')
   All globally available variables should be declared here.
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+window.viewBackups = viewer.viewBackups
+window.viewRepositories = viewer.viewRepositories
+window.cacheInvalidate = viewer.cacheInvalidate
+window.getLogData = viewer.getLogData
 window.startBackup = backup.startBackup
 window.switchToLog = viewer.switchToLog
 window.getLogFiles = viewer.getLogFiles
-window.viewBackups = viewer.viewBackups
-window.cacheInvalidate = viewer.cacheInvalidate
-window.viewRepositories = viewer.viewRepositories
 window.nextPage = viewer.nextPage
 window.previousPage = viewer.previousPage
 window.firstPage = viewer.firstPage

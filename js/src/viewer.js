@@ -5,229 +5,65 @@ let util = require('./util')
 let filesize = require('filesize')
 
 /********** Log viewer frontend ********/
-let logText = $('#log-text')
-let noLogsError = $('#no-logs-error')
-let currentRepo = "";
+function _build_repolog_card(repo, repo_data) {
+
+  var repo_id=repo.replace(/[ -.:;#]/g, "")
+  var card_html = `<div class="card text-white bg-secondary">
+    <div class="card-header">
+      <a class="repo-card-collapse" data-toggle="collapse" href="#logcard-content-${repo_id}">${repo}</a>
+      <span class="badge badge-pill badge-dark repo-badge">
+        ${repo_data.length}
+      </span>
+    </div>
+    <div class="card-body collapse" id="logcard-content-${repo_id}">
+      <table class="backup-table table table-dark table-striped table-bordered table-sm">
+        <thead><tr><th scope="col">Filename</th></tr></thead>
+        <tbody>`;
+  repo_data.forEach(function (item, index) {
+    card_html += `          <tr><td>
+          <span class='backup-${item.status}' style="text-align:right">
+            <span class="icon-success fas fa-check-circle"></span>
+            <span class="icon-warning fas fa-exclamation-circle"></span>
+            <span class="icon-error fas fa-times-circle"></span>
+            <span class="loglink" onclick='window.getLogData("${repo}", "${item.filename}")'>
+              ${item.filename}
+            </span>
+          </span></td></tr>`;
+
+  });
+  card_html +='</tbody></table></div></div>';
+
+  return card_html;
+}
 
 function updateRepoList () {
-  let repoListHtml = []
-  $.getJSON('repos', res => {
-    let i = 0
-    $.each(res, (name, value) => {
-      repoListHtml += `
-        <li>
-          <a onClick="window.getLogFiles('${ name }')" >
-          <span class="glyphicon glyphicon-hdd"
-          aria-hidden="true"></span>
-            ${ name }
-          </a>
-        </li>`
-      i++
-    })
-
-    $('#repo-list').html(repoListHtml)
-
-  })
+  $.getJSON("logs", (data)=>{
+    let repocards = "";
+    $.each(data, function(repo, repo_data) {
+        // Build the repo global info
+        repocards += _build_repolog_card(repo, repo_data);
+    });
+    $("#repologs-card-list").empty().append(repocards);
+  });
 }
 
-function highlightListEntry (id) {
-  $('.shown-log').toggleClass('shown-log')
-  $(`#log-${ id }`).toggleClass('shown-log')
+function getLogData(repo, filename) {
+  var log_path = repo+"/"+filename;
+  $.getJSON("logs/"+log_path, (data)=>{
+    $("#logcontent_name").empty().append(`
+    <span class='backup-${data.status}' style="text-align:right">
+      <span class="icon-success fas fa-check-circle"></span>
+      <span class="icon-warning fas fa-exclamation-circle"></span>
+      <span class="icon-error fas fa-times-circle"></span>
+      <span'>${log_path}</span>
+    </span>`);
+    $("#logcontent_data").empty().append(data.content);
+  });
 }
 
-function setListItemStatus () {
-  for (let i = 0; i < env.fetchRecentLogsStatus; i++) {
-    $.getJSON('logs/' + currentRepo + "/" + i, res => {
-      let search = `#log-${i} .glyphicon`
-      let elem = $(search)
-      elem.css('color', env.icon[res.status][1])
-      elem.removeClass('glyphicon-time')
-      elem.addClass(`glyphicon-${ env.icon[res.status][0]}`)
-    })
-  }
-}
-
-function updateLogFileList (repo) {
-  let logFilesListHTML = []
-  let indicatorHTML = `
-    <span class="glyphicon glyphicon-time list-status-indicator"
-      aria-hidden="true"></span>`;
-
-  $.getJSON('logs/' + repo, res => {
-    let i = 0
-    $.each(res.files, (key, value) => {
-      logFilesListHTML += `
-        <li class='list-group-item'>
-          <a onClick="window.switchToLog(${ value[0] + 1 })" id="log-${ value[0] }">
-            ${ indicatorHTML }
-            ${ value[1] }
-          </a>
-        </li>`
-      i++
-    })
-
-    if(res.files.length > 0){
-        env.fetchRecentLogsStatus = res.files.length;
-        setListItemStatus()
-    }else{
-      logFilesListHTML = "<li><a>" + indicatorHTML + " No Log Files</a></li>";
-    }
-
-    $('#log-files').html(logFilesListHTML)
-
-  })
-}
-
-function getSetState (state) {
-  state = state || {}
-  let anchor = util.parseAnchor()
-  anchor = {
-    log: state.log || anchor.log || 1,
-    offset: state.offset || anchor.offset || 1
-  }
-  document.location.hash =
-    `#log:${ anchor.log };offset:${ anchor.offset }`
-  return anchor
-}
-
-function updatePathAndStatus (id) {
-  if ((id + 1) === env.lastLogID) {
-      return;
-  }
-  $.getJSON('logs/' + currentRepo + "/" + id, function (res) {
-
-    $('#log-path').html(`
-      <!-- js generated -->
-        <span class="glyphicon glyphicon-${ env.icon[res.status][0] }"
-          aria-hidden="true" style="font-size: 34px;
-          color: ${ env.icon[res.status][1] }; width: 42px;
-          margin-right: 4px; vertical-align: middle;"></span
-        ><input class="form-control" type="text"
-          value="${ res.filename }" readonly onClick="this.select();">
-      <!-- /js generated -->`)
-    highlightListEntry(id)
-  })
-}
-
-function insertLogData (linesArray) {
-  let [html, lineStatus] = [``, ``]
-  linesArray.forEach((val, index) => {
-    lineStatus = env.logLine[val[0]]
-    html = lineStatus ? `<mark class="${ env.logLine[val[0]][0] }"
-      style="background-color: ${ env.logLine[val[0]][1] };">` : ``
-    html += val[1] + '\n'
-    html += lineStatus ? `</mark>` : ``
-    logText.append(html)
-  })
-}
-
-function clearLog () { logText.html('') }
-
-let fadeLog = {
-  out: x => {
-    setTimeout(clearLog, env.transitionTime * 0.5)
-    logText.fadeOut(env.transitionTime * 0.5)
-  },
-  in: x => {
-    logText.fadeIn(env.transitionTime * 0.5)
-  }
-}
-
-function displayLogSection (state, availableLines) {
-  let url = `logs/` + currentRepo + "/" + `${ state.log - 1 }/${ state.offset - 1 }:${ availableLines }:1`
-  $.get(url, res => {
-    noLogsError.hide()
-    if (state.log === env.lastLogID) {
-      clearLog()
-      insertLogData(res.lines)
-    } else {
-      env.lastLogID = state.log
-      fadeLog.out()
-      setTimeout(x => {
-        insertLogData(res.lines)
-        fadeLog.in()
-      }, env.transitionTime * 0.5)
-    }
-  }).fail(err => {
-    noLogsError.show()
-    logText.hide()
-  })
-}
-
-function render (availableLines) {
-  console.log("rendering")
-  // availableLines = availableLines || util.determineLineCount()
-  // let state = getSetState()
-  // updatePathAndStatus(state.log - 1)
-  // displayLogSection(state, availableLines)
-}
-
-function switchToLog (id) {
-  $("#log-path").show();
-  getSetState({ log: id, offset: 1 })
-  render()
-}
-
-function addLogViewAdvise() {
-  $("#log-files").append("<li><a>Select a respository to see logs</a></li>");
-  $("#log-text").empty().text("Select a log to view its contents");
-}
-
-function getLogFiles (repo) {
-    $("#log-files").empty();
-    addLogViewAdvise();
-    currentRepo = repo;
-    updateLogFileList(repo);
-}
-
-function getNextOffset (state, direction, availableLines, callback) {
-
-  let url = `logs/` + currentRepo + "/" + `${ state.log - 1 }/${ state.offset - 1 }` +
-    `:${ availableLines }:${ direction }`
-  $.get(url, res => {
-    let subsequentUrl = `logs/` + currentRepo + "/" + `${ state.log - 1 }/${ res.offset + 1 }` +
-      `:${ availableLines }:${ direction }`
-    $.get(subsequentUrl, subsequentRes => {
-      if (subsequentRes.lines.length === 0) getSetState(state)
-      else callback(state, res, availableLines)
-    })
-  })
-}
-
-function switchPage (direction) {
-  var availableLines = util.determineLineCount()
-  getNextOffset(getSetState(), direction, availableLines,
-    (state, res, availableLines) => {
-      getSetState({ log: state.log, offset: res.offset + 1 })
-      render(availableLines)
-    }
-  )
-}
-
-function lastPage () {
-  let state = getSetState()
-  let url = `logs/` + currentRepo + "/" + + `${ state.log - 1 }`
-  $.get(url, res => {
-    let logLength = res.length
-    state.offset = logLength
-    getSetState(state)
-    switchPage(-1)
-  })
-}
-
-function nextPage () { switchPage(1) }
-
-function previousPage () { switchPage(-1) }
-
-function firstPage () {
-  let state = getSetState()
-  state.offset = 1
-  setTimeout(x => { getSetState(state) }, 1) // prevent anchor loss
-  // switchToLog(state.log)
-}
-
-function getCurrentRepo(){
-  return currentRepo;
+function switchToLog(repo, filename) {
+  viewRepositories();
+  getLogData(repo, filename);
 }
 
 /********** Backup viewer frontend ********/
@@ -245,9 +81,11 @@ function _build_repo_card(repo, repo_data, backup_table_body) {
       <span class="badge badge-pill badge-dark repo-badge">
         ${repo_data.archives}
       </span>
-      <span class='backup-${repo_data.last_result}' style="text-align:right">
+      <span class='backup-${repo_data.last_result} loglink' style="text-align:right" onclick='window.switchToLog("${repo}", "${repo_data.last_log}")'>
+
         <span class="icon-success fas fa-check-circle"></span>
-        <span class="icon-error fas fa-exclamation-circle"></span>
+        <span class="icon-warning fas fa-exclamation-circle"></span>
+        <span class="icon-error fas fa-times-circle"></span>
         <span  style="text-align:right">Last backup ${repo_data.last_date} at ${repo_data.last_time}</span>
       </span>
     </div>
@@ -339,32 +177,22 @@ function viewBackups(){
   });
 
   // Display results
+  $("#logs-container").hide();
   $("#backups-container").show();
-  $("#log-viewer, #pagination-row, #log-path, #repo-list-container").hide();
 }
 
 // Log page entry point
 function viewRepositories(){
-  // updateRepoList();
-  // $("#log-files").empty();
-  // addLogViewAdvise();
-  // $("#backups-overview").hide();
-  // $("#logs-overview").show();
-  // $("#log-viewer, #log-list-container, #pagination-row, #repo-list-container").show();
+  updateRepoList();
+  $("#backups-container").hide();
+  $("#logs-container").show();
 }
 
 module.exports = {
-  getCurrentRepo: getCurrentRepo,
-  updateRepoList: updateRepoList,
   viewBackups: viewBackups,
-  cacheInvalidate:cacheInvalidate,
   viewRepositories: viewRepositories,
-  render: render,
+  updateRepoList: updateRepoList,
+  cacheInvalidate:cacheInvalidate,
+  getLogData: getLogData,
   switchToLog: switchToLog,
-  getLogFiles: getLogFiles,
-  nextPage: nextPage,
-  previousPage: previousPage,
-  updateLogFileList: updateLogFileList,
-  firstPage: firstPage,
-  lastPage: lastPage
 }

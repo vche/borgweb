@@ -70,6 +70,7 @@ def create_backup_status():
         #TODO Configure number of run status to get
         log_dir, log_files = logs._get_logs(repo)
         if(len(log_files) > 0):
+            repo_data["last_log"] = log_files[0]
             repo_data["last_result"], repo_data["last_date"], repo_data["last_time"] = logs.getLogFileStatus(log_dir + "/" + log_files[0])
 
         # Get details on each backup
@@ -78,6 +79,7 @@ def create_backup_status():
             backup.update(borg_archinfo)
             repo_graph["x"].append(borg_archinfo["date"])
             repo_graph["y"].append(borg_archinfo["size"])
+            # TODO: actually get the backup log file
 
         output["repos"][repo] = repo_data
         output["bargraph"].append(repo_graph)

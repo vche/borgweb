@@ -51,45 +51,33 @@
 
     <!-- Container for the log page --->
     <div id="logs-container" class="container-fluid">
+      <!-- Row for the repo backups title --->
       <div class="row">
-        <div class="col-sm-offset-3 col-sm-9">
-          <p id="log-path"></p>
+        <div class="col">
+          <h2 id="backup_header" class="text-light">Borg repositories logs</h2>
         </div>
       </div>
-      <div id="logs-overview">
-        <!-- log file list, log text -->
-        <div class="col-sm-3 list-viewer well" id="repo-list-container">
-          <ul id="repo-list" class="nav nav-pills nav-stacked"></ul>
+
+      <!-- Row for the repos --->
+      <div class="row " id="repologs-row">
+        <div class="col-4" id="repologs-card-list">
+          <div class="row " id="repologs-card-list">
+            <!-- Repo cards are added here --->
+          </div>
         </div>
-        <div class="col-sm-2 list-viewer well" id="log-list-container">
-          <ul id="log-files" class="list-group "></ul>
+        <div class="col" id="logdata-card">
+          <!-- Log content card here --->
+          <div class="card text-white bg-secondary">
+            <div class="card-header">
+              <span id="logcontent_name"></span>
+            </div>
+            <div class="card-body text-monospace text-wrap overflow-auto log-content">
+              <small id="logcontent_data">
+            </small>
+            </div>
+          </div>
         </div>
-        <div class="col-sm-6" id="log-viewer">
-            <pre id="log-text"></pre>
-        </div>
-      </div>
-      <div class="row" id="pagination-row">
-        <!-- pagination buttons -->
-        <div class="col-sm-5">
-        </div><!-- /col-sm-3 -->
-        <div class="col-sm-5">
-          <ul class="pagination">
-            <li>
-              <a href="#" aria-label="Previous" onClick="window.previousPage()">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-            <li><a href="#" aria-label="Beginning of file" id="nextPage"
-              onClick="window.firstPage()"><x-i18n>Beginning…</x-i18n></a></li>
-            <li><a href="#" aria-label="End of file" id="previousPage"
-              onClick="window.lastPage()"><x-i18n>End of file</x-i18n></a></li>
-            <li>
-              <a href="#" aria-label="Next" onClick="window.nextPage()">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          </ul>
-        </div>
+        <!-- End of repo cards --->
       </div>
     </div>
     <!-- End of log page --->
