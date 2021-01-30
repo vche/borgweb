@@ -15,16 +15,22 @@ from pathlib import Path
 
 @blueprint.route('/cacheflush', methods=['GET'])
 def invalidate_backup_cache():
-    # Invalidate the cache by removing the file
-    filepath = Path(current_app.config["STATUS_CACHE_PATH"])
-    if filepath.is_file():
-        os.remove(filepath)
-    return "{'status':'ok'}"
+    try:
+        # Invalidate the cache by removing the file
+        filepath = Path(current_app.config["STATUS_CACHE_PATH"])
+        if filepath.is_file():
+            os.remove(filepath)
+        return "{'status':'ok'}"
+    except Exception as e:
+        print(f"Error processing cache invalidate request: {e}")
 
 @blueprint.route('/backups', methods=['GET'])
 def get_backups():
-    # Get data from cache, and if invalid create it
-    return load_backup_cache() or create_backup_status()
+    try:
+        # Get data from cache, and if invalid create it
+        return load_backup_cache() or create_backup_status()
+    except Exception as e:
+        print(f"Error processing backups request: {e}")
 
 def save_backup_cache(cache_data):
     with open(current_app.config["STATUS_CACHE_PATH"], "w") as f:
@@ -34,6 +40,7 @@ def load_backup_cache():
     filepath = Path(current_app.config["STATUS_CACHE_PATH"])
     cache_ttl = current_app.config["STATUS_CACHE_TTL"]
     if filepath.is_file() and ((time.time() - filepath.stat().st_mtime) < cache_ttl):
+        print(f"Loading backups cache from {filepath}", flush=True)
         with open(filepath, "r") as f:
             return json.load(f)
     else:
@@ -44,12 +51,12 @@ def create_backup_status():
     output = { "repos": {}, "bargraph":[] }
     borg = BorgClient(current_app.config["BORG_PATH"])
 
+    print(f"Creating backups status", flush=True)
     for repo, repo_config in repos.items():
         repo_data = {}
         repo_graph = {"type": "bar", "name": repo, "x":[], "y":[]}
         repo_data["backups"] = []
         repo_data["script"] = repo_config.get("script", "")
-
 
         # Get repo info
         borg.set_repo(repo_config["repo_path"], pwd=repo_config["repo_pwd"])
@@ -88,4 +95,5 @@ def create_backup_status():
     # Convert the data to json, cache it and return it
     status_data = json.dumps(output)
     save_backup_cache(status_data)
+    print(f"Backups status created")
     return status_data

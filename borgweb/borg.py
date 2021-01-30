@@ -25,6 +25,7 @@ class BorgClient:
             env_list = self._set_pwd(env_list, pwd)
         #print(f"Running borg with ARGS:{arg_list}")
         try:
+            print(f"Executing borg client: {arg_list}")
             res = subprocess.run(arg_list, stdout=subprocess.PIPE, check=True, env=env_list)
         except subprocess.CalledProcessError as e:
             print(f"ERROR when executing borg client: {e}")
@@ -79,6 +80,7 @@ class BorgClient:
         infopath = f"{repo}::{archive}" if archive else repo
 
         # Run borg client
+        print(f"Fetching info on {infopath}")
         res = self._run_sync(["info", "--json", infopath], pwd)
 
         return self._parse_info_result(res.stdout) if res else {}
@@ -88,6 +90,7 @@ class BorgClient:
         if not repo:
             repo = self._current_repo
         # Run borg client
+        print(f"Fetching list on {repo}")
         res = self._run_sync(["list", "--json", repo], pwd)
         return self._parse_list_result(res.stdout) if res else {}
 
