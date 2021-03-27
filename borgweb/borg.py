@@ -2,9 +2,14 @@
 borg client wrapper
 """
 
-import subprocess, os
+import subprocess
+import os
 import json
+import logging
 from pathlib import Path
+
+log = logging.getLogger(__name__)
+
 
 class BorgClient:
 
@@ -23,12 +28,11 @@ class BorgClient:
         # If a pwd is specified, overwrite the one possibly already set
         if pwd:
             env_list = self._set_pwd(env_list, pwd)
-        #print(f"Running borg with ARGS:{arg_list}")
         try:
-            print(f"Executing borg client: {arg_list}")
+            log.info(f"Executing borg client: {arg_list}")
             res = subprocess.run(arg_list, stdout=subprocess.PIPE, check=True, env=env_list)
         except subprocess.CalledProcessError as e:
-            print(f"ERROR when executing borg client: {e}")
+            log.exception("Failed to execute borg client: %s", e)
         return res
 
     def _set_pwd(self, env_list, pwd):
@@ -54,7 +58,7 @@ class BorgClient:
                 info["csize"] = parsed["cache"]["stats"]["total_csize"]
                 info["dsize"] = parsed["cache"]["stats"]["unique_csize"]
         except (json.JSONDecodeError, KeyError) as e:
-            print(f"ERROR: Invalid borg info output: {e}")
+            log.error("Invalid borg info output: %s", e)
         return info
 
     def _parse_list_result(self, json_output):
@@ -64,7 +68,7 @@ class BorgClient:
             parsed = json.loads(json_output)
             info = [{"name": arch["archive"]} for arch in parsed["archives"]]
         except (json.JSONDecodeError, KeyError) as e:
-            print(f"ERROR: Invalid borg list output: {e}")
+            log.error("Invalid borg list output: %s", e)
         return info
 
     def set_repo(self, repo, pwd=None):
@@ -80,7 +84,7 @@ class BorgClient:
         infopath = f"{repo}::{archive}" if archive else repo
 
         # Run borg client
-        print(f"Fetching info on {infopath}")
+        log.info(f"Fetching info on {infopath}")
         res = self._run_sync(["info", "--json", infopath], pwd)
 
         return self._parse_info_result(res.stdout) if res else {}
@@ -90,7 +94,7 @@ class BorgClient:
         if not repo:
             repo = self._current_repo
         # Run borg client
-        print(f"Fetching list on {repo}")
+        log.info(f"Fetching list on {repo}")
         res = self._run_sync(["list", "--json", repo], pwd)
         return self._parse_list_result(res.stdout) if res else {}
 

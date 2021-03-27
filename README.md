@@ -107,3 +107,38 @@ BORG_LOGGING_CONF = "/var/log/borg/logging.conf"
 TO_BACKUP = "/var/www/borgWebDan"
 BACKUP_CMD = "BORG_LOGGING_CONF={BORG_LOGGING_CONF} borg create --list --stats --show-version --show-rc {REPOSITORY}::{NAME}-{LOCALTIME} {TO_BACKUP} >{LOG_DIR}/test/{NAME}-{LOCALTIME} 2>&1 </dev/null"
 ```
+
+## Development
+
+# Install Python code and dependencies:
+```
+virtualenv --python=python3 borg-env
+source borg-env/bin/activate
+pip install tox pytest
+git clone https://github.com/vche/borgweb.git
+cd borgweb
+pip install -e .
+```
+
+# Install JS code and dependencies:
+```
+cd js
+npm install
+npm install --global gulp-cli
+```
+
+# Start the local Flask webserver:
+```
+cd ../../
+mkdir logs
+./borg-env/bin/borgweb
+```
+
+# Start the watch process and Browsersync
+# In another shell navigate to `borgweb/js` and enter:
+```
+gulp watch
+```
+
+
+

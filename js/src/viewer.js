@@ -139,42 +139,53 @@ function cacheInvalidate(){
 
 // Backup page entry point
 function viewBackups(){
-  $.getJSON("backups", (data)=>{
-    let repocards = "";
-    $.each(data.repos, function(repo, repo_data){
-        let backup_table_body = "";
-        $.each(repo_data.backups, function(p, backup){
-          // Add a line to the table for this backup
-          backup_table_body = `<tr>
-              <td>${backup.date}</td>
-              <td>${filesize(backup.size)}</td>
-              <td>${filesize(backup.csize)}</td>
-              <td>${filesize(backup.dsize)}</td>
-            </tr>` + backup_table_body;
-        });
+    $.getJSON("backups", (data)=>{
+        let repocards = "";
 
-        // Build the repo global info
-        repocards += _build_repo_card(repo, repo_data, backup_table_body)
+        if ("error" in data) {
+            repocards = `<div class="alert alert-danger" role="alert">${data.error}</div>`;
+        }
+        else {
+            $.each(data.repos, function(repo, repo_data){
+                let backup_table_body = "";
+                $.each(repo_data.backups, function(p, backup){
+                // Add a line to the table for this backup
+                backup_table_body = `<tr>
+                    <td>${backup.date}</td>
+                    <td>${filesize(backup.size)}</td>
+                    <td>${filesize(backup.csize)}</td>
+                    <td>${filesize(backup.dsize)}</td>
+                    </tr>` + backup_table_body;
+                });
+                // If there is no backups, set sizes to 0
+                if (repo_data.archives == 0) {
+                    repo_data.size = 0;
+                    repo_data.csize = 0;
+                    repo_data.dsize = 0;
+                }
+                // Build the repo global info
+                repocards += _build_repo_card(repo, repo_data, backup_table_body)
+            });
+
+            // Update the backup graph
+            var layout = {
+                xaxis: {title: 'Backup date'},
+                yaxis: {title: 'Backup size'},
+                title: 'Stored backups'
+            };
+            var config = {
+                scrollZoom: true,
+                responsive: true
+            }
+            plotly.newPlot('backup-plot', data.bargraph, layout, config);
+
+            // Add the repo html
+            $("#refresh-time").empty().append(data.ctime);
+        }
+        $("#repo-card-list").empty().append(repocards);
+        $("#loadsign").hide();
+        $("#backups-container").show();
     });
-
-    // Update the backup graph
-    var layout = {
-      xaxis: {title: 'Backup date'},
-      yaxis: {title: 'Backup size'},
-      title: 'Stored backups'
-    };
-    var config = {
-      scrollZoom: true,
-      responsive: true
-    }
-    plotly.newPlot('backup-plot', data.bargraph, layout, config);
-
-    // Add the repo html
-    $("#refresh-time").empty().append(data.ctime);
-    $("#repo-card-list").empty().append(repocards);
-    $("#loadsign").hide();
-    $("#backups-container").show();
-  });
 
   // Display results
   $("#logs-container").hide();

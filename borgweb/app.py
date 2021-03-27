@@ -1,9 +1,20 @@
 import os
+import logging
 
 from flask import Flask, render_template
 from flask import g as flaskg
 
 from .views import blueprint
+
+log = logging.getLogger(__name__)
+
+
+def setup_logging(logfile=None, loglevel=logging.INFO):
+    logging.basicConfig(
+        filename=logfile or None,
+        level=loglevel,
+        format='[%(levelname)-7s %(asctime)s %(name)s,%(filename)s:%(lineno)d] %(message)s'
+    )
 
 
 def err404(error):
@@ -22,6 +33,8 @@ def create_app():
     app.jinja_env.globals['flaskg'] = flaskg
     app.register_error_handler(404, err404)
 
+    setup_logging(logfile=app.config["LOG_FILE"])
+    log.info("Borgweb started")
     return app
 
 

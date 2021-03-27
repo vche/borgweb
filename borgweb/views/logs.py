@@ -2,12 +2,14 @@
 logs view
 """
 
+import logging
 import os
 
 from flask import current_app, jsonify
 
 from . import blueprint
 
+log = logging.getLogger(__name__)
 SUCCESS, INFO, WARNING, DANGER = 'success', 'info', 'warning', 'danger'
 
 
@@ -71,13 +73,13 @@ def _get_logs(repo):
     except (KeyError, OSError) as e:
         log_dir = ""
         log_files = []
-        print(f"Invalid configuration: {e}")
+        log.error(f"Invalid configuration: {e}")
     return log_dir, sorted(log_files, reverse=True)
 
 
 def getLogFileStatus(log_file):
     with open(log_file, 'r') as f:
-        length = f.seek(0, os.SEEK_END)
+        f.seek(0, os.SEEK_END)
         return overall_classifier(f)
 
 
@@ -112,6 +114,6 @@ def get_log_content(repo, filename):
         log_data['content'] = log_lines
         log_data['status'], _, _ = overall_lines_classifier(log_lines)
     except (KeyError, OSError) as e:
-        print(f"Invalid configuration: {e}")
+        log.error(f"Invalid configuration: {e}")
 
     return log_data

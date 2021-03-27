@@ -2,6 +2,7 @@
 backup view
 """
 
+import logging
 import subprocess
 import time
 
@@ -9,6 +10,7 @@ from flask import current_app, render_template, jsonify
 
 from . import blueprint
 
+log = logging.getLogger(__name__)
 process = None
 
 

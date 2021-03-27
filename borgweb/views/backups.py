@@ -2,6 +2,7 @@
 backup view
 """
 
+import logging
 import time
 
 from flask import current_app, render_template, jsonify
@@ -11,6 +12,8 @@ import os
 from borgweb.borg import BorgClient
 import json
 from pathlib import Path
+
+log = logging.getLogger(__name__)
 
 
 @blueprint.route('/cacheflush', methods=['GET'])
@@ -22,7 +25,9 @@ def invalidate_backup_cache():
             os.remove(filepath)
         return "{'status':'ok'}"
     except Exception as e:
-        print(f"Error processing cache invalidate request: {e}")
+        error_str = f"Error processing cache invalidate request: {e}"
+        log.error(error_str)
+        return {"error": error_str}
 
 @blueprint.route('/backups', methods=['GET'])
 def get_backups():
@@ -30,7 +35,9 @@ def get_backups():
         # Get data from cache, and if invalid create it
         return load_backup_cache() or create_backup_status()
     except Exception as e:
-        print(f"Error processing backups request: {e}")
+        error_str = f"Error processing backups request: {e}"
+        log.error(error_str)
+        return {"error": error_str}
 
 def save_backup_cache(cache_data):
     with open(current_app.config["STATUS_CACHE_PATH"], "w") as f:
@@ -40,7 +47,7 @@ def load_backup_cache():
     filepath = Path(current_app.config["STATUS_CACHE_PATH"])
     cache_ttl = current_app.config["STATUS_CACHE_TTL"]
     if filepath.is_file() and ((time.time() - filepath.stat().st_mtime) < cache_ttl):
-        print(f"Loading backups cache from {filepath}", flush=True)
+        log.info(f"Loading backups cache from {filepath}")
         with open(filepath, "r") as f:
             return json.load(f)
     else:
@@ -51,7 +58,7 @@ def create_backup_status():
     output = { "repos": {}, "bargraph":[] }
     borg = BorgClient(current_app.config["BORG_PATH"])
 
-    print(f"Creating backups status", flush=True)
+    log.info(f"Creating backups status")
     for repo, repo_config in repos.items():
         repo_data = {}
         repo_graph = {"type": "bar", "name": repo, "x":[], "y":[]}
@@ -95,5 +102,5 @@ def create_backup_status():
     # Convert the data to json, cache it and return it
     status_data = json.dumps(output)
     save_backup_cache(status_data)
-    print(f"Backups status created")
+    log.info(f"Backups status created")
     return status_data
