@@ -25,10 +25,10 @@ class Config(object):
         # Repo  name
         "server1": {
             # Repo absolute path
-            "repo_path": "/path/to/backup/server1",
+            "repo_path": "/repos_backups/server1",
 
             # Repo logs absolute path, or relative to the main LOG_DIR
-            "log_path": "/media/dwarfdisk/Backup/logs/mediadwarf",
+            "log_path": "/repos_logs/server1",
 
             # Repo password
             "repo_pwd": "backup",
@@ -39,8 +39,8 @@ class Config(object):
             "script": "script",
         },
         "server2": {
-            "repo_path": "/path/to/backup/server1",
-            "log_path": "/media/dwarfdisk/Backup/logs/dwarfpi",
+            "repo_path": "/repos_backups/server2",
+            "log_path": "/repos_logs/server2",
             "repo_pwd": "backup",
         },
     }
