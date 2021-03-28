@@ -14,5 +14,6 @@ logs
 repo
 borgweb/_version.py
 borg-env
+pyvenv
 .eggs
 *-lock.json

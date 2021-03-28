@@ -1,5 +1,8 @@
 #!/bin/sh
+BACKUP_NAME="$(hostname)"
 
+# Setting this, so the repo does not need to be given on the commandline:
+export BORG_LOGS=/media/dwarfdisk/Backup/logs
 
 # Setting this, so you won't be asked for your repository passphrase:
 export BORG_PASSPHRASE='backup'
@@ -8,7 +11,7 @@ export BORG_PASSPHRASE='backup'
 
 # Log file name format to include timestamp
 LOG_FILE_NAME="$(hostname)-$(date +'%Y-%m-%dT%H%M%S').log"
-LOG_FILE="/var/log/borg/$LOG_FILE_NAME"
+LOG_FILE="$BORG_LOGS/$BACKUP_NAME/$(hostname)-$(date +'%Y-%m-%dT%H%M%S').log"
 
 # Local backup storage
 export BORG_REPO=/media/backupdisk/backup/server1
@@ -110,4 +113,3 @@ if [ "$REMOTE_LOG_FILE" != "" ]; then
 fi
 
 exit ${global_exit}
-

@@ -30,7 +30,7 @@ Example scripts are provided in [etc](https://github.com/vche/borgweb/tree/maste
 
 
 TODO:
-* Add links to logs to each backup (currently only the most recent one has is linked)
+* Fix graph scaling, especially with several servers
 * Async backup scan to improve loading
 * Manually run a backup script when configured
 
@@ -38,28 +38,33 @@ TODO:
 
 ## Configuration
 
-Update [config.py](https://github.com/vche/borgweb/blob/master/borgweb/config.py) as required:
+Update [config.cfg](https://github.com/vche/borgweb/blob/master/borgweb/config.cfg) as required.
+The template provide examples for the repository configuration.
 
-Configure the server address and port:
+### Borgweb configuration
+The following default values are set, but they can be overwritten as needed in the config.cfg/
+
+Server address and port:
 ```python
 HOST = '0.0.0.0'  # use 0.0.0.0 to bind to all interfaces
 PORT = 5000  # ports < 1024 need root
 DEBUG = True  # if True, enable reloader and debugger
 ```
 
-Configure the path of the borg binary:
+Path of the borg binary:
 ```python
 #: borg / borgweb configuration
 BORG_PATH="/usr/bin/borg"
 ```
 
-Configure the time (in secs) after wich the backups are rescanned and the cache location.
+Time (in secs) after wich the backups are rescanned and the cache location.
 Accessing or refreshing the interface will only rescan the backups if the last scan is older than the TTL (Manual scan can still be triggered form the UI)
 ```python
 STATUS_CACHE_TTL=43200
 STATUS_CACHE_PATH="/tmp/borgweb.cache"
 ```
 
+### Repositories configuration
 Configure the repositories to scan.
 Each repository must be configured with the following:
 * Repository path (where actual backups are stored)
@@ -97,18 +102,38 @@ BACKUP_REPOS = {
 }
 ```
 
-Those fields are currently unused and will be removed or implemented in future versions:
-```python
-#: borg / borgweb configuration
-LOG_DIR = '/var/log/borg'
-REPOSITORY = '/var/www/repo' #
-NAME = 'localhost'
-BORG_LOGGING_CONF = "/var/log/borg/logging.conf"
-TO_BACKUP = "/var/www/borgWebDan"
-BACKUP_CMD = "BORG_LOGGING_CONF={BORG_LOGGING_CONF} borg create --list --stats --show-version --show-rc {REPOSITORY}::{NAME}-{LOCALTIME} {TO_BACKUP} >{LOG_DIR}/test/{NAME}-{LOCALTIME} 2>&1 </dev/null"
+## Docker use
+
+Using docker cli:
+```bash
+docker pull vche/borgweb
+docker run -p 5000:5000 -v /path/to/backups:/repos_backups -v /path/to/logs:/repos_logs -d -n borgweb vche/borgweb
 ```
 
+Using docker compose
+```yaml
+version: "3.7"
+
+services:
+  borgweb:
+    container_name: borgweb
+    hostname: borgweb
+    restart: unless-stopped
+    image: vche/borgweb
+    ports:
+      - 5000:5000
+    user: 0:0
+    volumes:
+      - Users/viv/dev/config.cfg:/config/config_viv.cfg
+      - /Volumes/media/dwarfdisk/Backup:/repos_backups
+      - /Volumes/media/dwarfdisk/Backup/logs:/repos_logs
+```
+
+docker run --user 0 -p 5000:5000 -v /Users/viv/dev/config.cfg:/config/config_viv.cfg -v /Volumes/media/dwarfdisk/Backup:/repos_backups -v /Volumes/media/dwarfdisk/Backup/logs:/repos_logs --name borgweb borgweb
+
 ## Development
+
+Steps to build and run locally
 
 # Install Python code and dependencies:
 ```
@@ -135,10 +160,8 @@ mkdir logs
 ```
 
 # Start the watch process and Browsersync
-# In another shell navigate to `borgweb/js` and enter:
+This is only needed if you update the js files, to get updates and rebuild the bundle.
+In another shell navigate to `borgweb/js` and enter:
 ```
 gulp watch
 ```
-
-
-

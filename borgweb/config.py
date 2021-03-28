@@ -1,3 +1,4 @@
+import logging
 class Config(object):
     """This is the basic configuration class for BorgWeb."""
 
@@ -6,8 +7,9 @@ class Config(object):
     PORT = 5000  # ports < 1024 need root
     DEBUG = True  # if True, enable reloader and debugger
 
-    # Path to logfile. If left empty, logs will be sent to the console
+    # Path to logfile. If left empty, logs will be sent to the console. Optional log leve, default is info
     LOG_FILE = ''
+    LOG_LEVEL = logging.DEBUG
 
     # Base directory for relative paths specified in repos 'log_path'
     LOG_DIR = '/var/log/borg'
@@ -21,9 +23,9 @@ class Config(object):
 
     BACKUP_REPOS = {
         # Repo  name
-        "mediadwarf": {
+        "server1": {
             # Repo absolute path
-            "repo_path": "/media/dwarfdisk/Backup/mediadwarf",
+            "repo_path": "/path/to/backup/server1",
 
             # Repo logs absolute path, or relative to the main LOG_DIR
             "log_path": "/media/dwarfdisk/Backup/logs/mediadwarf",
@@ -33,23 +35,12 @@ class Config(object):
 
             # Command/script to run to manually start a backup.
             # If left empty or not specified, the backup won't be
-            # manually runnable
+            # manually runnable. Not yet used
             "script": "script",
-
-            # Filled with discovered backups in the repo
-            "backups": []
         },
-        "dwarfpi": {
-            "repo_path": "/media/dwarfdisk/Backup/dwarfpi",
+        "server2": {
+            "repo_path": "/path/to/backup/server1",
             "log_path": "/media/dwarfdisk/Backup/logs/dwarfpi",
             "repo_pwd": "backup",
-            "backups": []
         },
-        "domodwarf": {
-            "repo_path": "/media/dwarfdisk/Backup/domodwarf",
-            "log_path": "/media/dwarfdisk/Backup/logs/domodwarf",
-            "repo_pwd": "backup",
-            "backups": []
-        }
     }
-

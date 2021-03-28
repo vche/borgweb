@@ -12,11 +12,12 @@ log = logging.getLogger(__name__)
 
 
 class BorgClient:
+    """ Wrapp comand line calls to the borg cli. """
 
     def __init__(self, binpath):
         self._borgpath = Path(binpath)
         if not self._borgpath.is_file():
-            raise FileNotFoundError()
+            raise FileNotFoundError(f"Cannot find borg backup executable in {binpath}")
         self._current_env_list = None
         self._current_repo = None
 
@@ -97,4 +98,3 @@ class BorgClient:
         log.info(f"Fetching list on {repo}")
         res = self._run_sync(["list", "--json", repo], pwd)
         return self._parse_list_result(res.stdout) if res else {}
-

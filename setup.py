@@ -1,29 +1,28 @@
 # -*- encoding: utf-8 *-*
 import sys
 
+from setuptools import setup, find_packages
+
 min_python = (3, 4)
 if sys.version_info < min_python:
     print("BorgWeb requires Python %d.%d or later" % min_python)
     sys.exit(1)
 
-from setuptools import setup, find_packages
 
-with open('README.rst', 'r') as fd:
-    long_description = fd.read()
+long_description = "WEB UI for borg backup tool"
 
 setup(
     name='borgweb',
-    use_scm_version=dict(write_to='borgweb/_version.py'),
-    author='The Borg Collective (see AUTHORS file)',
-    author_email='borgbackup@python.org',
-    url='https://borgweb.readthedocs.io/',
-    description='Browser-based user interface for BorgBackup',
+    # use_scm_version=dict(write_to='borgweb/_version.py'),
+    author='Vivien Chene, original work by The Borg Collective (see AUTHORS)',
+    author_email='viv@vivc.org',
+    url='https://github.com/vche/borgweb',
+    description='Browser-based user interface for BorgBackup, inspired',
     long_description=long_description,
     license='BSD',
     platforms=['Linux', 'MacOS X', 'FreeBSD', 'OpenBSD', 'NetBSD', ],
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Environment :: Console',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: BSD License',
         'Operating System :: POSIX :: BSD :: FreeBSD',
@@ -36,6 +35,9 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: System :: Archiving :: Backup',
     ],
     packages=find_packages(),

@@ -27,13 +27,13 @@ def create_app():
     app.config.from_object('borgweb.config.Config')
     if os.environ.get('BORGWEB_CONFIG'):
         app.config.from_envvar('BORGWEB_CONFIG')
+    setup_logging(logfile=app.config["LOG_FILE"], loglevel=app.config.get("LOG_LEVEL"))
 
     app.register_blueprint(blueprint)
 
     app.jinja_env.globals['flaskg'] = flaskg
     app.register_error_handler(404, err404)
 
-    setup_logging(logfile=app.config["LOG_FILE"])
     log.info("Borgweb started")
     return app
 
