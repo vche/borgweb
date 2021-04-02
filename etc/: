@@ -1,0 +1,14 @@
+" Press ? for help
+
+.. (up a dir)
+/opt/borgweb/etc/
+  borg.service
+  borg.timer
+  borg_backup.sh*
+  borg_cleaner.service
+  borg_cleaner.timer
+  borg_log_cleaner.sh*
+  borgweb-logs-vche.png
+  borgweb-vche.png*
+  borgweb.service
+  config.cfg

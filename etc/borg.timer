@@ -1,0 +1,11 @@
+[Unit]
+Description=Run a daily backup of this host
+Requires=borg.service
+
+[Timer]
+#Unit=borg.service
+OnCalendar=*-*-* 4:15:00
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

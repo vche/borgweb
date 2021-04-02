@@ -1,0 +1,12 @@
+[Unit]
+Description=Borg backup of this host
+#Wants=borg.timer
+
+[Service]
+Type=oneshot
+ExecStart=/home/viv/bin/borg_backup.sh
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

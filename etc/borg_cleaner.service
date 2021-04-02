@@ -1,0 +1,12 @@
+[Unit]
+Description=Clean logs of pruned borg backups
+#Wants=borg.timer
+
+[Service]
+Type=oneshot
+ExecStart=/home/viv/bin/borg_log_cleaner.sh -l /media/dwarfdisk/Backup/logs -r /media/dwarfdisk/Backup
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
