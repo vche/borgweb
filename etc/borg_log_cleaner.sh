@@ -14,7 +14,7 @@ BORG_PWD='backup'
 declare -A REPOS_BACKUPS
 
 read_repo() {
-    if [[ "${REPOS_BACKUPS[$1]}" == "" ]]; then
+    if [[ "${REPOS_BACKUPS[$1]}" == "" ]] && [ -d $BORG_REPOS/$1 ]; then
         echo "Reading repo $1"
         REPOS_BACKUPS[$1]="$(sudo BORG_PASSPHRASE=$BORG_PWD borg list $BORG_REPOS/$1)"
     fi
@@ -84,6 +84,3 @@ for LOG in $LOG_LIST; do
         rm $LOG
     fi
 done
-
-FOO="${1:-default/pp}"
-echo $FOO
