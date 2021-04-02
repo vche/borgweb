@@ -17,6 +17,9 @@ read_repo() {
     if [[ "${REPOS_BACKUPS[$1]}" == "" ]] && [ -d $BORG_REPOS/$1 ]; then
         echo "Reading repo $1"
         REPOS_BACKUPS[$1]="$(sudo BORG_PASSPHRASE=$BORG_PWD borg list $BORG_REPOS/$1)"
+	return 1
+    else
+	return 2
     fi
 }
 
@@ -26,7 +29,6 @@ is_in_repo() {
         #echo "d$1 FOUND"
         return 1
     else
-        echo "$1 backup not found"
         return 2
     fi
 }
@@ -81,6 +83,6 @@ for LOG in $LOG_LIST; do
     check_log $LOG
     if [[ "$?" == "2"  ]]; then
         echo "Removing log $LOG"
-        rm $LOG
+	rm $LOG
     fi
 done
