@@ -1,10 +1,10 @@
 [Unit]
 Description=Run a daily backup of this host
-Requires=borg.service
+Requires=borg_cleaner.service
 
 [Timer]
-#Unit=borg.service
-OnCalendar=*-*-* 4:15:00
+#Unit=borg_cleaner.service
+OnCalendar=weekly
 RandomizedDelaySec=600
 
 [Install]
