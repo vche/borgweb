@@ -1,5 +1,5 @@
 # FROM python:3
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         borgbackup \
@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         rm -rf /var/cache/apt /var/lib/apt/lists
 ADD borgweb /borgweb
 ADD setup.py /
+ADD setup.cfg /
 ADD etc/config.cfg /config/
 ENV BORGWEB_CONFIG /config/config.cfg
 
