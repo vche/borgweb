@@ -46,6 +46,14 @@ class BorgClient:
         """Extract a subset of data from the info output to use in borgweb."""
         info  = {}
 
+        # If invalid info,return empty fields
+        if not json_output:
+            return {
+                    "date": "1970-01-01T00:00:00.000000",
+                    "size": 0,
+                    "csize": 0,
+                    "dsize": 0,
+            }
         try:
             parsed = json.loads(json_output)
             # If we got an archive info
@@ -88,7 +96,7 @@ class BorgClient:
         log.info(f"Fetching info on {infopath}")
         res = self._run_sync(["info", "--json", infopath], pwd)
 
-        return self._parse_info_result(res.stdout) if res else {}
+        return self._parse_info_result(res.stdout if res else None)
 
     def list(self, repo=None, archive=None, pwd=None):
         # Use repo set if none specified

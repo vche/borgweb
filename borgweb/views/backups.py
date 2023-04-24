@@ -96,9 +96,15 @@ def create_backup_status():
         # Get details on each backup
         for backup in repo_data["backups"]:
             borg_archinfo = borg.info(archive=backup["name"])
-            backup.update(borg_archinfo)
-            repo_graph["x"].append(borg_archinfo["date"])
-            repo_graph["y"].append(borg_archinfo["size"])
+            if borg_archinfo:
+                backup.update(borg_archinfo)
+                if "date" in borg_archinfo and borg_archinfo.get("size"):
+                    repo_graph["x"].append(borg_archinfo["date"])
+                    repo_graph["y"].append(borg_archinfo["size"])
+                else:
+                    log.error(f"Backup {borg_archinfo} has no date/size")
+            else:
+                log.info(f"No information for repo {backup['name']}")
             # TODO: actually get the backup log file
 
         output["repos"][repo] = repo_data
