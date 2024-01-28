@@ -12,6 +12,8 @@ build-js = { cmd = "npm install && npm install --global gulp-cli", cwd = "./js" 
 build = { depends_on = ["build-py", "build-js"] }
 borgweb = { cmd = "export BORGWEB_CONFIG=../etc/config.dev.cfg && borgweb", cwd = "./" }
 watch = { cmd = "gulp watch", cwd = "./js" }
+docker-multi = { cmd = "docker buildx build --platform linux/amd64,linux/arm64 -t vche/borgweb:latest .", cwd = "." }
+docker-build = { cmd = "docker build -t vche/borgweb:latest .", cwd = "." }
 
 [dependencies]
 python = "3.10.*"

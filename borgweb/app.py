@@ -64,11 +64,12 @@ class BorgBackupAlarmNotifier:
         self._config = config
         self.logger = logging.getLogger(__name__)
         self.loop = asyncio.new_event_loop()
-        self._webhook = SyncWebhook.from_url(self._config.get("DISCORD_WEBHOOK"))
-        self._user = self._config.get("DISCORD_WEBHOOK_USER")
         self._message_device = self._config.get("DISCORD_MESSAGE_DEVICE", self.DEFAULT_MESSAGE_DEVICE)
         self._message = self._config.get("DISCORD_MESSAGE", self.DEFAULT_MESSAGE)
         self._enabled = self._config.get("ENABLE_DISCORD_ALARMING", False)
+        if self._enabled:
+            self._webhook = SyncWebhook.from_url(self._config.get("DISCORD_WEBHOOK"))
+            self._user = self._config.get("DISCORD_WEBHOOK_USER")
 
     def _build_message(self, alarms):
         if not alarms:
