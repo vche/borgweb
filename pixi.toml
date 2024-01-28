@@ -1,0 +1,22 @@
+[project]
+name = "borgweb"
+version = "0.1.0"
+description = "Browser-based user interface for BorgBackup"
+authors = ["Vivien Chene <viv.chene@gmail.com>"]
+channels = ["conda-forge"]
+platforms = ["osx-64", 'linux-64']
+
+[tasks]
+build-py = { cmd = "pip install -e .", cwd = "./" }
+build-js = { cmd = "npm install && npm install --global gulp-cli", cwd = "./js" }
+build = { depends_on = ["build-py", "build-js"] }
+borgweb = { cmd = "export BORGWEB_CONFIG=../etc/config.dev.cfg && borgweb", cwd = "./" }
+watch = { cmd = "gulp watch", cwd = "./js" }
+
+[dependencies]
+python = "3.10.*"
+pip = ">=23.3.2,<23.4"
+flask = ">=3.0.1,<3.1"
+nodejs = ">=20.9.0,<20.10"
+"discord.py" = ">=2.3.2,<2.4"
+requests = ">=2.31.0,<2.32"

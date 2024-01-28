@@ -17,3 +17,7 @@ borg-env
 pyvenv
 .eggs
 *-lock.json
+# pixi environments
+.pixi
+etc/config.dev.cfg
+

@@ -17,9 +17,16 @@ class Config(object):
     # Path to borg backup tool
     BORG_PATH = "/usr/bin/borg"
 
-    # Repo status cache configuration. TTL in secs
-    STATUS_CACHE_TTL = 43200
+    # Repo status cache configuration. Update period in secs (default 12h)
+    STATUS_CACHE_UPDATE_PERIOD = 43200
     STATUS_CACHE_PATH = "/tmp/borgweb.cache"
+
+    # Enable alarming on discord channel for failed backups
+    ENABLE_DISCORD_ALARMING = False
+    DISCORD_WEBHOOK = "1420474818:https://discord.com/api/webhooks/1127505560233333090/dGZjhM32M4Vd-Iy1B9H"
+    DISCORD_WEBHOOK_USER = "Borg backup monitor"
+    DISCORD_MESSAGE = "**{} Backups failed**:\n\n{}"
+    DISCORD_MESSAGE_DEVICE = "- {}: Failed with status {} on {} at {}\n"
 
     BACKUP_REPOS = {
         # Repo  name
