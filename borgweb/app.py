@@ -95,7 +95,7 @@ class BorgBackupAlarmNotifier:
         alarms = []
         for repo in new_data["repos"]:
             repo_data = new_data["repos"][repo]
-            old_repo_data = old_data.get("repos", {}).get(repo)
+            old_repo_data = old_data.get("repos", {}).get(repo) if old_data else {}
 
             # If the backup failed
             if repo_data.get("last_result") != BackupLogs.SUCCESS:
