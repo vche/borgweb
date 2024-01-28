@@ -180,8 +180,7 @@ class BackupsData:
                     backup.update(borg_archinfo)
                     if "date" in borg_archinfo and borg_archinfo.get("size"):
                         repo_graph["x"].append(borg_archinfo["date"])
-                        # repo_graph["y"].append(borg_archinfo["size"])
-                        repo_graph["y"].append(100)
+                        repo_graph["y"].append(borg_archinfo["size"])
                     else:
                         log.error(f"Backup {borg_archinfo} has no date/size")
                 else:
