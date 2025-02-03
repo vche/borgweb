@@ -107,7 +107,7 @@ class BorgBackupAlarmNotifier:
                     ):
                     continue
 
-                log.info(f"Alarm raised for repo {repo}, backup on {repo_data['last_date']} at {repo_data['last_time']} failed ({repo_data['last_log']})")
+                log.info(f"Alarm raised for repo {repo}, backup on {repo_data.get('last_date', 'unknown')} at {repo_data.get('last_time', 'unknown')} failed ({repo_data.get('last_log', 'unknown')})")
                 alarms.append((repo, repo_data))
         return alarms
 

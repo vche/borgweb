@@ -1,4 +1,7 @@
 {
+  "pnpm.onlyBuiltDependencies": [
+    "es5-ext"    
+  ],
   "name": "borgweb",
   "version": "0.0.1",
   "description": "BorgWeb is a browser-based user interface for Borg Backup.",
