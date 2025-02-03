@@ -1,6 +1,6 @@
 import pytest
 
-def test_simple_dummy:
+def test_simple_dummy():
     """
     Test that the testing infra is working.
 
